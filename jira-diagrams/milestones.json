@@ -1,0 +1,70 @@
+﻿{
+    "Milestones": [
+        {
+            "Id": "DH-123",
+            "Title": "Milestone1",
+            "Description": "Milestone 1 description",
+            "DueDate": "2017-10-01"
+        },
+        {
+            "Id": "DH-124",
+            "Title": "Milestone2",
+            "Description": "Milestone 2 description",
+            "DueDate": "2017-11-01"
+        },
+        {
+            "Id": "DH-125",
+            "Title": "Milestone3",
+            "Description": "Milestone 3 description",
+            "DependsOnMilestones": [
+                { "Id": "DH-123" },
+                { "Id": "DH-124" }
+            ],
+            "DueDate": "2017-12-01"
+        }
+
+    ],
+    "Tasks": [
+        {
+            "ID": "DH-200",
+            "Title": "Task 1",
+            "Implements": [
+                { "Id": "DH-123" },
+                { "Id": "DH-124" }
+            ]
+        },
+        {
+            "ID": "DH-201",
+            "Title": "Task 2",
+            "Implements": [ { "Id": "DH-123" } ]
+        },
+        {
+            "ID": "DH-202",
+            "Title": "Task 3",
+            "Implements": [ { "Id": "DH-123" } ]
+        },
+        {
+            "ID": "DH-203",
+            "Title": "Task 4",
+            "Implements": [ { "Id": "DH-124" } ]
+        },
+        {
+            "ID": "DH-204",
+            "Title": "Task 5",
+            "Implements": [ { "Id": "DH-124" } ]
+        },
+        {
+            "ID": "DH-205",
+            "Title": "Task 6",
+            "Implements": [ { "Id": "DH-124" } ]
+        },
+        {
+            "ID": "DH-206",
+            "Title": "Task 7",
+            "Implements": [
+                { "Id": "DH-123" },
+                { "Id": "DH-125" }
+            ]
+        }
+    ]
+}
