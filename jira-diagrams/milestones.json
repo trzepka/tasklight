@@ -1,24 +1,35 @@
 ﻿{
     "Milestones": [
         {
-            "Id": "DH-123",
+            "Id": "PR-123",
             "Title": "Milestone1",
             "Description": "Milestone 1 description",
-            "DueDate": "2017-10-01"
+            "DueDate": "2017-10-01",
+            "DependsOn": [
+                { "Id": "PR-200" },
+                { "Id": "PR-201" },
+                { "Id": "PR-202" },
+                { "Id": "PR-203" },
+            ]
         },
         {
-            "Id": "DH-124",
+            "Id": "PR-124",
             "Title": "Milestone2",
             "Description": "Milestone 2 description",
-            "DueDate": "2017-11-01"
+            "DueDate": "2017-11-01",
+            "DependsOn": [
+                { "Id": "PR-204" }
+            ]
         },
         {
-            "Id": "DH-125",
+            "Id": "PR-125",
             "Title": "Milestone3",
             "Description": "Milestone 3 description",
-            "DependsOnMilestones": [
-                { "Id": "DH-123" },
-                { "Id": "DH-124" }
+            "DependsOn": [
+                { "Id": "PR-205" },
+                { "Id": "PR-206" },
+                { "Id": "PR-123" },
+                { "Id": "PR-124" }
             ],
             "DueDate": "2017-12-01"
         }
@@ -26,45 +37,39 @@
     ],
     "Tasks": [
         {
-            "ID": "DH-200",
+            "ID": "PR-200",
             "Title": "Task 1",
-            "Implements": [
-                { "Id": "DH-123" },
-                { "Id": "DH-124" }
-            ]
+            "Status":  "Open"
         },
         {
-            "ID": "DH-201",
+            "ID": "PR-201",
             "Title": "Task 2",
-            "Implements": [ { "Id": "DH-123" } ]
+            "Status": "In Progress"
         },
         {
-            "ID": "DH-202",
+            "ID": "PR-202",
             "Title": "Task 3",
-            "Implements": [ { "Id": "DH-123" } ]
+            "Status": "In Progress"
         },
         {
-            "ID": "DH-203",
+            "ID": "PR-203",
             "Title": "Task 4",
-            "Implements": [ { "Id": "DH-124" } ]
+            "Status": "Closed"
         },
         {
-            "ID": "DH-204",
+            "ID": "PR-204",
             "Title": "Task 5",
-            "Implements": [ { "Id": "DH-124" } ]
+            "Status": "Open"
         },
         {
-            "ID": "DH-205",
+            "ID": "PR-205",
             "Title": "Task 6",
-            "Implements": [ { "Id": "DH-124" } ]
+            "Status": "Closed"
         },
         {
-            "ID": "DH-206",
+            "ID": "PR-206",
             "Title": "Task 7",
-            "Implements": [
-                { "Id": "DH-123" },
-                { "Id": "DH-125" }
-            ]
+            "Status": "Closed"
         }
     ]
 }

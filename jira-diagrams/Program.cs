@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.CommandLineUtils;
+using Newtonsoft.Json;
 using System;
+using System.IO;
 
 namespace jira_diagrams
 {
@@ -19,21 +21,30 @@ namespace jira_diagrams
             app.Command("milestone", command =>
             {
                 command.Description = "Generate dependecy graph based on milestones";
-                var type = command.Option("-t|--type <diagram-type>", "Diagram type", CommandOptionType.SingleValue);
+//                var type = command.Option("-t|--type <diagram-type>", "Diagram type", CommandOptionType.SingleValue);
                 var inputFile = command.Option("-f|--file <file-path>", "Path to a json file with input data", CommandOptionType.SingleValue);
                 command.OnExecute(() =>
                 {
-                    if(!type.HasValue())
+                    //if(!type.HasValue())
+                    //{
+                    //    Console.WriteLine("Type is required");
+                    //    return -1;
+                    //}
+                    string milestoneData = null;
+                    if (inputFile.HasValue())
                     {
-                        Console.WriteLine("Type is required");
-                        return -1;
+                        if (!File.Exists(inputFile.Value()))
+                        {
+                            Console.WriteLine($"File {inputFile} could not be found.");
+                            return -1;
+                        }
+                        milestoneData = File.ReadAllText(inputFile.Value());
                     }
-                    if (!inputFile.HasValue())
+                    else
                     {
-                        Console.WriteLine("Input file is required");
-                        return -1;
+                        milestoneData = Console.In.ReadToEnd();
                     }
-                    new MilestoneGraphCommand(type.Value(), inputFile.Value()).Execute();
+                    new MilestoneGraphCommand(null, JsonConvert.DeserializeObject<MilestoneData>(milestoneData)).Execute();
                     return 0;
                 });
             });

@@ -4,52 +4,58 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Text;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace jira_diagrams
 {
     internal class MilestoneGraphCommand
     {
         private string format;
-        private readonly string inputFile;
+        private readonly MilestoneData milestoneData;
 
-        public MilestoneGraphCommand(string format, string inputFile)
+        public MilestoneGraphCommand(string format, MilestoneData milestoneData)
         {
             this.format = format;
-            this.inputFile = inputFile;
+            this.milestoneData = milestoneData;
         }
 
         internal void Execute()
         {
-            if(!File.Exists(inputFile))
-            {
-                Console.WriteLine($"File {inputFile} could not be found.");
-                return;
-            }
-            var milestoneData = JsonConvert.DeserializeObject<MilestoneData>(File.ReadAllText(inputFile));
             var output = new StringBuilder();
             output.AppendLine("graph LR");
-            var milestones = milestoneData.Milestones.ToDictionary(m => m.Id);
-
-            foreach(var milestone in milestoneData.Milestones)
+            var existingTasks = milestoneData.Tasks.ToDictionary(t => t.Id);
+            var existingNodes = milestoneData.Tasks.Cast<Entity>().Union(milestoneData.Milestones.Cast<Entity>()).ToLookup(x => x.Id);
+            var statuses = milestoneData.Tasks.Select(t => t.Status).Distinct().Select((s, i) => new { Name = s, NodeId = $"status-{i}" });
+            var milestones = milestoneData.Milestones.Select(m => new { Milestone = m, ShownStatuses = statuses.ToDictionary(s => s.Name, x => new { NodeId = x.NodeId, Name = x.Name }) });
+            var shownStatuses = new HashSet<string>();
+            foreach (var milestone in milestones)
             {
-                output.AppendLine($"milestone-{milestone.Id}(\"Milestone {milestone.Id} - {milestone.Title} - Due: {milestone.DueDate.ToString("yyyy-MM-dd")}\")");
-                if(milestone.DependsOnMilestones != null)
-                foreach(var dependsOn in milestone.DependsOnMilestones.Where(d => milestones.ContainsKey(d.Id)))
-                {
-                    output.AppendLine($"milestone-{dependsOn.Id} --> milestone-{milestone.Id}");
-                }
+                output.AppendLine($"{milestone.Milestone.NodeId}(\"Milestone {milestone.Milestone.Id} - {milestone.Milestone.Title} - Due: {milestone.Milestone.DueDate.ToString("yyyy-MM-dd")}\")");
             }
-            foreach(var task in milestoneData.Tasks)
+            foreach (var link in milestones.SelectMany(m => m.Milestone.DependsOn.Select(x => new { Milestone = m.Milestone, DependsOn = x, ShownStatuses = m.ShownStatuses }).Where(d => existingNodes.Contains(d.DependsOn.Id))))
             {
-                output.AppendLine($"task-{task.Id}(\"{task.Id} - {task.Title}\")");
-                if(task.Implements != null)
+                if (existingTasks.ContainsKey(link.DependsOn.Id))
                 {
-                    foreach(var implemented in task.Implements.Where(i => milestones.ContainsKey(i.Id)))
-                    {
-                        output.AppendLine($"task-{task.Id} --> milestone-{implemented.Id}");
-                    }
+                    var task = existingTasks[link.DependsOn.Id];
+                    output.AppendLine($"{task.NodeId}(\"{task.Id} - {task.Title}\")");
                 }
+                var node = existingNodes[link.DependsOn.Id].First();
+                if (existingTasks.ContainsKey(node.Id))
+                {
+                    var status = link.ShownStatuses[existingTasks[node.Id].Status];
+                    var statusMilestoneId = $"{status.NodeId}-{link.Milestone.NodeId}";
+                    if (!shownStatuses.Contains(statusMilestoneId))
+                    {
+                        output.AppendLine($"{status.NodeId}-{link.Milestone.NodeId}(\"{status.Name}\") --> {link.Milestone.NodeId}");
+                        shownStatuses.Add(statusMilestoneId);
+                    }
+                    output.AppendLine($"{node.NodeId} --> {status.NodeId}-{link.Milestone.NodeId}");
 
+                }
+                else
+                {
+                    output.AppendLine($"{node.NodeId} --> {link.Milestone.NodeId}");
+                }
             }
 
             Console.WriteLine(output.ToString());
