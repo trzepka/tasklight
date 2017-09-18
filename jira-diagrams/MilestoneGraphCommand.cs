@@ -30,7 +30,8 @@ namespace jira_diagrams
             var shownStatuses = new HashSet<string>();
             foreach (var milestone in milestones)
             {
-                output.AppendLine($"{milestone.Milestone.NodeId}(\"Milestone {milestone.Milestone.Id} - {milestone.Milestone.Title} - Due: {milestone.Milestone.DueDate.ToString("yyyy-MM-dd")}\")");
+                var due = milestone.Milestone.DueDate.HasValue ? $" - Due: {milestone.Milestone.DueDate.Value.ToString("yyyy-MM-dd")}" : String.Empty;
+                output.AppendLine($"{milestone.Milestone.NodeId}(\"Milestone {milestone.Milestone.Id} - {milestone.Milestone.Title}{due}\")");
             }
             foreach (var link in milestones.SelectMany(m => m.Milestone.DependsOn.Select(x => new { Milestone = m.Milestone, DependsOn = x, ShownStatuses = m.ShownStatuses }).Where(d => existingNodes.Contains(d.DependsOn.Id))))
             {

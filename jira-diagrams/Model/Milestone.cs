@@ -8,7 +8,7 @@ namespace jira_diagrams
         public string Title { get; set; }
         public string Description { get; set; }
         public IEnumerable<Entity> DependsOn { get; set; }
-        public DateTime DueDate { get; set; }
+        public DateTime? DueDate { get; set; }
         public override string NodeId => $"milestone-{Id}";
 
     }
